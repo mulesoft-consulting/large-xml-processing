@@ -47,10 +47,14 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
             <spring:property name="recordTagName" value="product"/>
         </custom-transformer>
         
-         <batch:execute name="large-xml-processingBatch" doc:name="Batch Execute"/>
+          <batch:execute name="large-xml-processingBatch" doc:name="Batch Execute"/> 
+<!--    <foreach doc:name="For Each"> -->
+<!--             <component class="com.mulesoft.services.batch.BatchUnmarshal" doc:name="Java"/> -->
+<!--         </foreach> -->
 
     </flow>
     <batch:job name="large-xml-processingBatch">
+        <batch:threading-profile maxThreadsActive="5" poolExhaustedAction="RUN"/>
         <batch:input>
             <logger message="In batch input" level="INFO" doc:name="Logger"/>
         </batch:input>
