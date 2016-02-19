@@ -1,5 +1,6 @@
 package com.mulesoft.services.xml.chunking;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
+
+import com.ctc.wstx.sax.WstxSAXParserFactory;
 
 import batch.digital.hoares.products.ProductType;
 

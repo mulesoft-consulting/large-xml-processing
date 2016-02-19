@@ -1,0 +1,116 @@
+<binding xmlns:tns="http://hoares.digital.batch/Products.xsd" name="binding" package="batch.digital.hoares.products" trim-whitespace="true">
+  <namespace uri="http://hoares.digital.batch/Products.xsd" default="elements" prefix="tns"/>
+  <format label="tns:CreditDebitCode" type="batch.digital.hoares.products.CreditDebitCode"/>
+  <mapping abstract="true" type-name="tns:InterestType" class="batch.digital.hoares.products.InterestType">
+    <value style="element" name="credit" get-method="getCredit" set-method="setCredit" usage="optional"/>
+    <value style="element" name="debit" get-method="getDebit" set-method="setDebit" usage="optional"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:AdditionalDetailsType" class="batch.digital.hoares.products.AdditionalDetailsType">
+    <value style="element" name="IBAN" get-method="getIBAN" set-method="setIBAN" usage="optional"/>
+    <value style="element" name="sortCode" get-method="getSortCode" set-method="setSortCode" usage="optional"/>
+    <value style="element" name="primaryIndicator" get-method="getPrimaryIndicator" set-method="setPrimaryIndicator" usage="optional"/>
+    <structure map-as="tns:InterestType" get-method="getInterests" set-method="setInterests" usage="optional" name="interests"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:DateType" class="batch.digital.hoares.products.DateType">
+    <value style="element" name="open" get-method="getOpen" set-method="setOpen" usage="optional"/>
+    <value style="element" name="close" get-method="getClose" set-method="setClose" usage="optional"/>
+    <value style="element" name="lastStatement" get-method="getLastStatement" set-method="setLastStatement" usage="optional"/>
+    <value style="element" name="minRepaymentDueDate" get-method="getMinRepaymentDueDate" set-method="setMinRepaymentDueDate" usage="optional"/>
+    <value style="element" name="system" get-method="getSystem" set-method="setSystem" usage="optional"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:LimitType" class="batch.digital.hoares.products.LimitType">
+    <value style="element" name="overdraft" get-method="getOverdraft" set-method="setOverdraft" usage="optional"/>
+    <value style="element" name="arrange" get-method="getArrange" set-method="setArrange" usage="optional"/>
+    <value style="element" name="credit" get-method="getCredit" set-method="setCredit" usage="optional"/>
+    <value style="element" name="repaymentAmount" get-method="getRepaymentAmount" set-method="setRepaymentAmount" usage="optional"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:BalanceType" class="batch.digital.hoares.products.BalanceType">
+    <value style="element" name="EODFlag" get-method="getEODFlag" set-method="setEODFlag" usage="optional"/>
+    <value style="element" name="ledger" get-method="getLedger" set-method="setLedger" usage="optional"/>
+    <value style="element" name="available" get-method="getAvailable" set-method="setAvailable" usage="optional"/>
+    <value style="element" name="average" get-method="getAverage" set-method="setAverage" usage="optional"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:ProductDetailsType" class="batch.digital.hoares.products.ProductDetailsType">
+    <value style="element" name="productNo" get-method="getProductNo" set-method="setProductNo"/>
+    <value style="element" name="type" get-method="getType" set-method="setType"/>
+    <value style="element" name="fullName" get-method="getFullName" set-method="setFullName"/>
+    <value style="element" name="shortName" get-method="getShortName" set-method="setShortName" usage="optional"/>
+    <value style="element" name="currencyCode" get-method="getCurrencyCode" set-method="setCurrencyCode"/>
+    <value style="element" name="status" get-method="getStatus" set-method="setStatus"/>
+    <structure map-as="tns:AdditionalDetailsType" get-method="getAdditionalDetails" set-method="setAdditionalDetails" name="additionalDetails"/>
+    <structure map-as="tns:DateType" get-method="getDates" set-method="setDates" name="dates"/>
+    <structure map-as="tns:LimitType" get-method="getLimits" set-method="setLimits" name="limits"/>
+    <structure map-as="tns:BalanceType" get-method="getBalances" set-method="setBalances" name="balances"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:TransactionType" class="batch.digital.hoares.products.TransactionType">
+    <collection get-method="getTransactionList" set-method="setTransactionList" create-type="java.util.ArrayList">
+      <structure type="batch.digital.hoares.products.TransactionType$Transaction" name="transaction">
+        <value style="element" name="refID" get-method="getRefID" set-method="setRefID"/>
+        <value style="element" name="code" get-method="getCode" set-method="setCode"/>
+        <value style="element" name="type" get-method="getType" set-method="setType" format="tns:CreditDebitCode"/>
+        <value style="element" name="amount" get-method="getAmount" set-method="setAmount"/>
+        <value style="element" name="currencyCode" get-method="getCurrencyCode" set-method="setCurrencyCode"/>
+        <value style="element" name="postingDate" get-method="getPostingDate" set-method="setPostingDate"/>
+        <value style="element" name="valueDate" get-method="getValueDate" set-method="setValueDate"/>
+        <value style="element" name="narrative" get-method="getNarrative" set-method="setNarrative"/>
+        <value style="element" name="additionalRef1" get-method="getAdditionalRef1" set-method="setAdditionalRef1" usage="optional"/>
+        <value style="element" name="additionalRef2" get-method="getAdditionalRef2" set-method="setAdditionalRef2" usage="optional"/>
+        <value style="element" name="additionalRef3" get-method="getAdditionalRef3" set-method="setAdditionalRef3" usage="optional"/>
+        <value style="element" name="additionalRef4" get-method="getAdditionalRef4" set-method="setAdditionalRef4" usage="optional"/>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping abstract="true" type-name="tns:HoldingType" class="batch.digital.hoares.products.HoldingType">
+    <collection get-method="getHoldingList" set-method="setHoldingList" create-type="java.util.ArrayList">
+      <structure type="batch.digital.hoares.products.HoldingType$Holding" name="holding">
+        <value style="element" name="name" get-method="getName" set-method="setName"/>
+        <value style="element" name="type" get-method="getType" set-method="setType"/>
+        <value style="element" name="code" get-method="getCode" set-method="setCode"/>
+        <value style="element" name="currency" get-method="getCurrency" set-method="setCurrency"/>
+        <value style="element" name="quantity" get-method="getQuantity" set-method="setQuantity"/>
+        <value style="element" name="amount" get-method="getAmount" set-method="setAmount"/>
+        <value style="element" name="price" get-method="getPrice" set-method="setPrice"/>
+        <value style="element" name="valueDate" get-method="getValueDate" set-method="setValueDate"/>
+        <value style="element" name="status" get-method="getStatus" set-method="setStatus" usage="optional"/>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping abstract="true" type-name="tns:DealType" class="batch.digital.hoares.products.DealType">
+    <collection get-method="getDealList" set-method="setDealList" create-type="java.util.ArrayList">
+      <structure type="batch.digital.hoares.products.DealType$Deal" name="deal">
+        <value style="element" name="refID" get-method="getRefID" set-method="setRefID"/>
+        <value style="element" name="seq" get-method="getSeq" set-method="setSeq"/>
+        <value style="element" name="amount" get-method="getAmount" set-method="setAmount"/>
+        <value style="element" name="dealDate" get-method="getDealDate" set-method="setDealDate"/>
+        <value style="element" name="maturityDate" get-method="getMaturityDate" set-method="setMaturityDate"/>
+        <value style="element" name="currencyCode" get-method="getCurrencyCode" set-method="setCurrencyCode"/>
+        <value style="element" name="interestRate" get-method="getInterestRate" set-method="setInterestRate"/>
+        <value style="element" name="interestGrossMaturity" get-method="getInterestGrossMaturity" set-method="setInterestGrossMaturity"/>
+        <value style="element" name="interestGrossPaid" get-method="getInterestGrossPaid" set-method="setInterestGrossPaid"/>
+        <value style="element" name="interestNetPaid" get-method="getInterestNetPaid" set-method="setInterestNetPaid"/>
+        <value style="element" name="interestNetAccrued" get-method="getInterestNetAccrued" set-method="setInterestNetAccrued"/>
+        <value style="element" name="status" get-method="getStatus" set-method="setStatus"/>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping abstract="true" type-name="tns:SubProductType" class="batch.digital.hoares.products.SubProductType">
+    <collection get-method="getSubProductList" set-method="setSubProductList" create-type="java.util.ArrayList">
+      <structure type="batch.digital.hoares.products.SubProductType$SubProduct" name="subProduct">
+        <structure map-as="tns:ProductDetailsType" get-method="getProductDetails" set-method="setProductDetails" name="productDetails"/>
+        <structure map-as="tns:TransactionType" get-method="getTransactions" set-method="setTransactions" usage="optional" name="transactions"/>
+        <structure map-as="tns:DealType" get-method="getDeals" set-method="setDeals" usage="optional" name="deals"/>
+        <structure map-as="tns:HoldingType" get-method="getHoldings" set-method="setHoldings" usage="optional" name="holdings"/>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping abstract="true" type-name="tns:ProductType" class="batch.digital.hoares.products.ProductType">
+    <structure map-as="tns:ProductDetailsType" get-method="getProductDetails" set-method="setProductDetails" name="productDetails"/>
+    <structure map-as="tns:TransactionType" get-method="getTransactions" set-method="setTransactions" usage="optional" name="transactions"/>
+    <structure map-as="tns:DealType" get-method="getDeals" set-method="setDeals" usage="optional" name="deals"/>
+    <structure map-as="tns:HoldingType" get-method="getHoldings" set-method="setHoldings" usage="optional" name="holdings"/>
+    <structure map-as="tns:SubProductType" get-method="getSubProducts" set-method="setSubProducts" usage="optional" name="subProducts"/>
+  </mapping>
+  <mapping class="batch.digital.hoares.products.ProductType" name="product">
+    <structure map-as="tns:ProductType"/>
+  </mapping>
+</binding>
