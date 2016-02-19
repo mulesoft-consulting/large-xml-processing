@@ -1,5 +1,6 @@
 package com.mulesoft.services.file;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -10,7 +11,10 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Callable;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
+
+import com.mulesoft.services.largefiles.utils.LargeFileIOUtils;
 
 /**
  * Performs a CRC32 Check of a file using a stream of the file.
@@ -33,20 +37,23 @@ public class StreamCRC32 implements Callable{
 	 */
 	private long checkCRCOfStream(InputStream is) throws MuleException {
 
-		CloseShieldInputStream csis = new CloseShieldInputStream(is);
 		CRC32 crcMaker = new CRC32();
 		byte[] buffer = new byte[8192];
 		int bytesRead;
 		
 		try{
-			while((bytesRead = csis.read(buffer)) != -1) {
+			while((bytesRead = is.read(buffer)) != -1) {
 				crcMaker.update(buffer, 0, bytesRead);
 			}
 		}catch(IOException e){
 			LOG.error("IO error reading file");
 			throw new DefaultMuleException(MessageFactory.createStaticMessage("IO error performing CRC check"), e);
 		}finally{
-			csis.close();
+			try {
+				is.close();
+			} catch (IOException e) {
+				LOG.error("IO error closing stream");
+			}
 		}
 
 		long crc = crcMaker.getValue(); 
@@ -58,7 +65,8 @@ public class StreamCRC32 implements Callable{
 	@Override
 	public Object onCall(MuleEventContext eventContext) throws Exception {
 		
-		long crc = checkCRCOfStream((InputStream) eventContext.getMessage().getPayload());
+		long crc = checkCRCOfStream(LargeFileIOUtils.InputStream(eventContext.getMessage()));
+		
 		eventContext.getMessage().setInvocationProperty("CRC_VALUE", crc);
 		
 		return eventContext.getMessage();

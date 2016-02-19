@@ -7,20 +7,60 @@
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+   
+    <spring:beans>
+        <spring:bean id="groupIdParser" name="GroupIdParserBean" class="com.mulesoft.services.xml.xpath.XMLParser">
+       			<spring:property name="xmlTagName" value="products"/>
+                <spring:property name="xmlAttributeName" value="groupID"/>
+        </spring:bean>
+         <spring:bean id="saxSchemaValidationDefaultErrorHandler" name="SAXSchemaValidationDefaultErrorHandlerBean" class="com.mulesoft.services.xml.validation.SAXSchemaValidationDefaultErrorHandler"/>
+    </spring:beans>
+   
+   
+   
+   
+   
     <file:connector name="File" autoDelete="true" streaming="true" validateConnections="true" doc:name="File"/>
     <flow name="large-xml-processingFlow">
         
         <file:inbound-endpoint path="/Users/ashleyosbourne/inbound" connector-ref="File" responseTimeout="10000" doc:name="read XML file" moveToDirectory="/Users/ashleyosbourne/outbound" moveToPattern="#[server.dateTime]-#[message.inboundProperties['originalFilename']]"> 
             <file:filename-regex-filter pattern="(.*).xml" caseSensitive="false"></file:filename-regex-filter>  
-        </file:inbound-endpoint>  
-        
+        </file:inbound-endpoint>
         <logger message="File received: #[message.id]" level="INFO" doc:name="File received"/>
+        <set-variable variableName="filePath" value="#[flowVars['originalDirectory'] +&quot;/&quot; + flowVars['originalFilename']]" doc:name="Set filepath"/>
+         <component doc:name="Get GroupID">  
+           <spring-object bean="GroupIdParserBean"/>
+        </component> 
+ 
         
-        <component class="com.mulesoft.services.file.StreamCRC32" doc:name="Perform CRC32 Check"/>
+           <component class="com.mulesoft.services.file.StreamCRC32" doc:name="Perform CRC32 Check"/>
+  
+         
+          <message-filter throwOnUnaccepted="true" doc:name="Validate XML">
+            <custom-filter class="com.mulesoft.services.xml.validation.SAXSchemaValidationFilter">
+                <spring:property name="errorHandler" ref="saxSchemaValidationDefaultErrorHandler"/>
+                <spring:property name="schemaLocation" value="xsd/Products.xsd"/>
+            </custom-filter>
+        </message-filter>
+         
+       <custom-transformer class="com.mulesoft.services.xml.chunking.XMLStreamingIteratorTransformer" doc:name="XML Streaming Iterator Transformer">
+            <spring:property name="recordTagName" value="product"/>
+        </custom-transformer>
+        
+         <batch:execute name="large-xml-processingBatch" doc:name="Batch Execute"/>
+
     </flow>
     <batch:job name="large-xml-processingBatch">
+        <batch:input>
+            <logger message="In batch input" level="INFO" doc:name="Logger"/>
+        </batch:input>
         <batch:process-records>
-            <batch:step name="Batch_Step"/>
+            <batch:step name="Batch_Step">
+                <component class="com.mulesoft.services.batch.BatchUnmarshal" doc:name="Java"/>
+            </batch:step>
         </batch:process-records>
+        <batch:on-complete>
+            <logger message="In batch complete" level="INFO" doc:name="Logger"/>
+        </batch:on-complete>
     </batch:job>
 </mule>

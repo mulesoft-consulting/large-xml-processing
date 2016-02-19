@@ -1,0 +1,283 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://hoares.digital.batch/Products.xsd"
+           targetNamespace="http://hoares.digital.batch/Products.xsd"
+          elementFormDefault="qualified">
+  <xsd:element name='product' type='tns:ProductType'/>
+
+  <xsd:simpleType name ='CurrencyCode'>
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[A-Z]{3,3}"/>
+    </xsd:restriction>    
+  </xsd:simpleType>
+
+  <xsd:simpleType name="BalanceAmount">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="4"/>
+      <xsd:totalDigits value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="InterestRate">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="4"/>
+      <xsd:totalDigits value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="InterestAmount">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="4"/>
+      <xsd:totalDigits value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <xsd:simpleType name="TransactionAmount">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="4"/>
+      <xsd:totalDigits value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:simpleType name="HoldingQuantity">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="4"/>
+      <xsd:totalDigits value="15"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="HoldingAmount">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="2"/>
+      <xsd:totalDigits value="13"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="HoldingPrice">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="6"/>
+      <xsd:totalDigits value="13"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:simpleType name="LimitAmount">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="4"/>
+      <xsd:totalDigits value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+
+  <xsd:simpleType name="Max1000Text">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="1000"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Max256Text">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="256"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Max50Text">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="50"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="IBANIdentifierType">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="SortCodeType">
+    <xsd:restriction base="xsd:string">      
+      <xsd:minLength value="6"/>
+      <xsd:maxLength value="6"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name='InterestType'>
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="0" name="credit" type='tns:InterestAmount'/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="debit" type="tns:InterestAmount"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name='AdditionalDetailsType'>
+    <xsd:sequence>      
+      <xsd:element maxOccurs="1" minOccurs="0" name="IBAN" type='tns:IBANIdentifierType'/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="sortCode" type="tns:SortCodeType"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="primaryIndicator" type="tns:Max50Text"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="interests" type="tns:InterestType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name='DateType'>
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="0" name="open" type='tns:ISODate'/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="close" type="tns:ISODate"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="lastStatement" type="tns:ISODate"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="minRepaymentDueDate" type="tns:ISODate"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="system" type="tns:ISODate"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="ISODate">
+    <xsd:restriction base="xsd:date"/>
+  </xsd:simpleType>
+
+  <xsd:complexType name='LimitType'>
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="0" name="overdraft" type='tns:LimitAmount'/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="arrange" type="tns:LimitAmount"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="credit" type="tns:LimitAmount"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="repaymentAmount" type="tns:LimitAmount"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name='BalanceType'>
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="0" name="EODFlag" type='tns:Max50Text'/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="ledger" type='tns:BalanceAmount'/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="available" type="tns:BalanceAmount"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="average" type="tns:BalanceAmount"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  
+
+  <xsd:complexType name='ProductDetailsType'>
+    <xsd:annotation>
+      <xsd:documentation>
+        All the core details of the product will be held in this schema.
+      </xsd:documentation>
+    </xsd:annotation>
+    
+    <xsd:sequence>
+      <xsd:element name ='productNo' type='tns:Max256Text' />
+      <xsd:element name ='type' type ='xsd:string' />
+      <xsd:element name ='fullName' type ='tns:Max256Text'/>
+      <xsd:element name ='shortName' minOccurs='0' maxOccurs='1' type ='tns:Max256Text'/>
+      <xsd:element name ='currencyCode' type ='tns:CurrencyCode'/>
+      <xsd:element name ='status' type ='tns:Max50Text'/>
+      <xsd:element name ='additionalDetails' type ='tns:AdditionalDetailsType'/>
+      <xsd:element name ='dates' type ='tns:DateType'/>
+      <xsd:element name ='limits' type ='tns:LimitType'/>    
+      <xsd:element name ='balances' type ='tns:BalanceType'/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="CreditDebitCode">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="CRDT"/>
+      <xsd:enumeration value="DBIT"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name='TransactionType'>
+    <xsd:sequence>
+      <xsd:element name='transaction' minOccurs='1' maxOccurs='unbounded'>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name ='refID' type='tns:Max256Text' />
+            <xsd:element name ='code' type='tns:Max256Text' />
+            <xsd:element name ='type' type='tns:CreditDebitCode' />
+            <xsd:element name ='amount' type='tns:TransactionAmount' />
+            <xsd:element name ='currencyCode' type='tns:CurrencyCode' />
+            <xsd:element name ='postingDate' type='tns:ISODate' />
+            <xsd:element name ='valueDate' type='tns:ISODate' />
+            <xsd:element name ='narrative' type='tns:Max256Text' />
+            <xsd:element name ='additionalRef1' minOccurs='0' maxOccurs='1'  type='tns:Max1000Text' />
+            <xsd:element name ='additionalRef2' minOccurs='0' maxOccurs='1'  type='tns:Max1000Text' />
+            <xsd:element name ='additionalRef3' minOccurs='0' maxOccurs='1'  type='tns:Max1000Text' />
+            <xsd:element name ='additionalRef4' minOccurs='0' maxOccurs='1'  type='tns:Max1000Text' />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>      
+  </xsd:complexType>
+
+  <xsd:complexType name='HoldingType'>
+    <xsd:sequence>
+      <xsd:element name='holding' minOccurs='1' maxOccurs='unbounded'>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name ='name' type='tns:Max256Text' />
+            <xsd:element name ='type' type='tns:Max256Text' />
+            <xsd:element name ='code' type='tns:Max256Text' />
+            <xsd:element name ='currency' type='tns:CurrencyCode' />
+            <xsd:element name ='quantity' type='tns:HoldingQuantity' />
+            <xsd:element name ='amount' type='tns:HoldingAmount' />
+            <xsd:element name ='price' type='tns:HoldingPrice' />            
+            <xsd:element name ='valueDate' type='tns:ISODate' />
+            <xsd:element name ='status' minOccurs='0' maxOccurs='1' type='tns:Max50Text' />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <xsd:complexType name='DealType'>
+    <xsd:sequence>
+      <xsd:element name='deal' minOccurs='1' maxOccurs='unbounded'>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name ='refID' type='tns:Max50Text' />
+            <xsd:element name ='seq' type='xsd:int' />
+            <xsd:element name ='amount' type='tns:TransactionAmount' />
+            <xsd:element name ='dealDate' type='tns:ISODate' />
+            <xsd:element name ='maturityDate' type='tns:ISODate' />             
+            <xsd:element name ='currencyCode' type='tns:CurrencyCode' />
+            <xsd:element name ='interestRate' type='tns:InterestRate' />
+            <xsd:element name ='interestGrossMaturity' type='tns:InterestAmount' />
+            <xsd:element name ='interestGrossPaid' type='tns:InterestAmount' />
+            <xsd:element name ='interestNetPaid' type='tns:InterestAmount' />
+            <xsd:element name ='interestNetAccrued' type='tns:InterestAmount' />
+            <xsd:element name ='status' type='tns:Max50Text' />           
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name='SubProductType'>
+    <xsd:sequence>
+      <xsd:element name='subProduct' minOccurs='1' maxOccurs='unbounded'>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name='productDetails' type='tns:ProductDetailsType'/>
+            <xsd:element name='transactions' maxOccurs="1" minOccurs="0" type='tns:TransactionType'/>
+            <xsd:element name='deals' maxOccurs="1" minOccurs="0" type='tns:DealType'/>
+            <xsd:element name='holdings' maxOccurs="1" minOccurs="0"  type='tns:HoldingType'/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  
+
+  <xsd:complexType name='ProductType'>
+    <xsd:annotation>
+      <xsd:documentation>
+        Schema will have product details, transactions, deals, holdings etc. 
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name='productDetails' type='tns:ProductDetailsType'/>
+      <xsd:element name='transactions' maxOccurs="1" minOccurs="0" type='tns:TransactionType'/>      
+      <xsd:element name='deals' maxOccurs="1" minOccurs="0" type='tns:DealType'/>
+      <xsd:element name='holdings' maxOccurs="1" minOccurs="0"  type='tns:HoldingType'/>
+      <xsd:element name='subProducts' maxOccurs="1" minOccurs="0"  type='tns:SubProductType'/>
+    </xsd:sequence>
+  
+  </xsd:complexType>
+</xsd:schema>
+
+

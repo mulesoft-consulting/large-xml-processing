@@ -49,7 +49,7 @@ public class XMLStreamingIteratorTransformer extends AbstractMessageTransformer 
 	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException {
 		Object payload = message.getOriginalPayload();
 		try{
-			return new XMLStreamingIterator((InputStream) payload, recordTagName);
+			return new XMLStreamingIterator(message, recordTagName);
 		} catch (Exception e) {
 			throw new TransformerException(MessageFactory.createStaticMessage("Unable to convert " + InputStream.class.getCanonicalName() + " to " + Iterator.class.getCanonicalName() + ": " + e.getMessage()), this);
 		}

@@ -1,0 +1,36 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://hoares.digital.batch/Products.xsd"
+           targetNamespace="http://hoares.digital.batch/Products.xsd"
+          elementFormDefault="qualified">
+    <xsd:include schemaLocation="Product.xsd"/>
+  <xsd:element name='products' type='tns:ProductsType'/>
+
+  <xsd:simpleType name="GroupDecimalType">
+    <xsd:restriction base="xsd:decimal">
+      <xsd:fractionDigits value="0"/>
+      <xsd:totalDigits value="18"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="GUIDType">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name='ProductsType'>
+    <xsd:annotation>
+      <xsd:documentation>
+        Schema will have product details, transactions, deals, holdings etc.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name='product' minOccurs='1' maxOccurs='unbounded' type='tns:ProductType' />      
+    </xsd:sequence>
+    
+    <xsd:attribute name='groupID' type='tns:GUIDType' use='required'/>
+    <xsd:attribute name='totalInGroup' type='tns:GroupDecimalType'/>   
+  </xsd:complexType>
+</xsd:schema>
+
+

@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
@@ -17,6 +19,12 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleMessage;
+
+import batch.digital.hoares.products.ProductType;
+
+import com.mulesoft.services.largefiles.utils.LargeFileIOUtils;
 
 /**
  * 
@@ -42,11 +50,11 @@ public class XMLStreamingIterator implements Iterator<byte[]> {
 	
 	private HashMap<String, Namespace> namespeces;
 	
-	private CloseShieldInputStream csis;
+	private InputStream csis;
 
-	public XMLStreamingIterator(InputStream is, String recordTagName) throws XMLStreamException {
+	public XMLStreamingIterator(MuleMessage message, String recordTagName) throws XMLStreamException, DefaultMuleException {
 		
-		csis = new CloseShieldInputStream(is);
+		csis = LargeFileIOUtils.InputStream(message);
 		inputFactory = XMLInputFactory.newInstance();
 		outputFactory = XMLOutputFactory.newInstance();
 		inputFactory.setProperty("javax.xml.stream.supportDTD", false);		
@@ -109,7 +117,10 @@ public class XMLStreamingIterator implements Iterator<byte[]> {
 
 				eventWriter.flush();
 				baos.flush();
+	
+	
 				return baos.toByteArray();
+				//TODO JAXB marshall here
 			} catch (Exception e) {
 				throw new RuntimeException("Unable to retrieve element", e);
 			} finally {

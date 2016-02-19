@@ -1,6 +1,6 @@
 package com.mulesoft.services.xml.validation;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.XMLConstants;
@@ -9,8 +9,8 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -20,6 +20,8 @@ import org.mule.config.i18n.MessageFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+
+import com.mulesoft.services.largefiles.utils.LargeFileIOUtils;
 
 /**
  * 
@@ -45,16 +47,18 @@ public class SAXSchemaValidationFilter implements Filter, Initialisable {
 	@Override
 	public void initialise() throws InitialisationException {
 		try {
+			
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(this.getClass().getResource("/" + schemaLocation));
-
+			
 			factory.setValidating(false);
 			factory.setNamespaceAware(true);
 			factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			factory.setSchema(schema);
 
 			SAXParser parser = factory.newSAXParser();
+			
 
 			reader = parser.getXMLReader();
 			reader.setErrorHandler(errorHandler);
@@ -65,21 +69,28 @@ public class SAXSchemaValidationFilter implements Filter, Initialisable {
 
 	@Override
 	public boolean accept(MuleMessage message) {
-		InputStream payload = (InputStream) message.getPayload();
+		InputStream is = null;
+		try {
+			is = LargeFileIOUtils.InputStream(message);
+		} catch (DefaultMuleException e1) {
+			e1.printStackTrace();
+		}
 		InputSource source = null;
-
-		CloseShieldInputStream csis = new CloseShieldInputStream(payload);
 		
 		try {
 			
-			source = new InputSource(csis);
+			source = new InputSource(is);
 			reader.parse(source);
 
 		} catch (Exception e) {
 			message.setProperty("schemaValidationError", e.getMessage(), PropertyScope.INVOCATION);
 			return false;
 		} finally {
-			csis.close();
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return true;
