@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
    
     <spring:beans>
         <spring:bean id="groupIdParser" name="GroupIdParserBean" class="com.mulesoft.services.xml.xpath.XMLParser">
@@ -56,7 +57,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 <!--         </foreach> -->
 
     </flow>
-    <batch:job name="large-xml-processingBatch">
+ <batch:job name="large-xml-processingBatch">
         <batch:threading-profile maxThreadsActive="5" poolExhaustedAction="RUN"/>
         <batch:input>
             <logger message="In batch input" level="INFO" doc:name="Logger"/>
@@ -64,8 +65,14 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
         <batch:process-records>
             <batch:step name="Batch_Step">
                 <component class="com.mulesoft.services.batch.BatchUnmarshal" doc:name="Java"/>
-                <db:insert config-ref="MySQL_Configuration" doc:name="Insert to DB">
-                    <db:parameterized-query><![CDATA[INSERT INTO Products (ProductFullName) VALUES (#[payload.productDetails.productNo])]]></db:parameterized-query>
+                <enricher source="#[payload]" target="#[flowVars['productInsertResult']]" doc:name="Message Enricher">
+                    <db:insert config-ref="MySQL_Configuration" doc:name="Insert to DB">
+                        <db:parameterized-query><![CDATA[INSERT INTO Products (ProductFullName) VALUES (#[payload.productDetails.productNo])]]></db:parameterized-query>
+                    </db:insert>
+                </enricher>
+                <set-payload value="#[payload.transactions.getTransactionList()]" doc:name="Set the payload to be all the transactions"/>
+                <db:insert config-ref="MySQL_Configuration" bulkMode="true" doc:name="Insert into transactions">
+                    <db:parameterized-query><![CDATA[INSERT INTO Transactions (refID) VALUES (#[payload.refID])]]></db:parameterized-query>
                 </db:insert>
             </batch:step>
         </batch:process-records>
