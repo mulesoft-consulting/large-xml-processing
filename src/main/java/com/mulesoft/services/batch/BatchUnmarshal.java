@@ -1,6 +1,7 @@
 package com.mulesoft.services.batch;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -10,10 +11,13 @@ import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
+import org.jibx.runtime.JiBXException;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.MessageFactory;
 
 import batch.digital.hoares.products.ProductType;
 
@@ -25,31 +29,32 @@ public class BatchUnmarshal implements Callable  {
 
 	@Override
 	public Object onCall(MuleEventContext eventContext) throws Exception {
-	    IBindingFactory bfact = 
-	            BindingDirectory.getFactory(ProductType.class);
-	    IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-	    ByteArrayInputStream input = new ByteArrayInputStream((byte[]) eventContext.getMessage().getPayload());
+		ByteArrayInputStream input = new ByteArrayInputStream((byte[]) eventContext.getMessage().getPayload());
+		try{
+			IBindingFactory bfact = 
+		            BindingDirectory.getFactory(ProductType.class);
+		    IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
+		    
+
+		    ProductType product = (ProductType) uctx.unmarshalDocument
+		            (input, null);
+		    
+		    eventContext.getMessage().setPayload(product);
+		    
+		    LOG.info("Product number: " + product.getProductDetails().getShortName());
+		}catch(JiBXException e){
+			throw new DefaultMuleException(MessageFactory.createStaticMessage("JIXB exception unmarshalling"), e);
+		}
+
+	    try{
+	    	input.close();
+	    }catch(IOException e){
+	    	e.printStackTrace();
+	    }
+	   
 	    
-	    ProductType product = (ProductType) uctx.unmarshalDocument
-	            (input, null);
-	    
-	    eventContext.getMessage().setPayload(product);
-	    
-	    LOG.info("Product number: " + product.getProductDetails().getShortName());
-	    
-	    
-//
-//		LOG.info("The payload is: " + eventContext.getMessage().getPayload());
-//		
-//		JAXBContext jc = JAXBContext.newInstance (ProductType.class);
-//        Unmarshaller  unmarshaller = jc.createUnmarshaller();
-//        ByteArrayInputStream input = new ByteArrayInputStream((byte[]) eventContext.getMessage().getPayload());
-//        ProductType product =   (ProductType) unmarshaller.unmarshal(input);
-//        input.close(); 
-//		
-//        eventContext.getMessage().setPayload(product);
         
-		return eventContext;
+		return eventContext.getMessage();
 	}
 
 
