@@ -41,7 +41,6 @@ public class BatchUnmarshal implements Callable  {
 		    
 		    eventContext.getMessage().setPayload(product);
 		    
-		    LOG.info("Product number: " + product.getProductDetails().getShortName());
 		}catch(JiBXException e){
 			throw new DefaultMuleException(MessageFactory.createStaticMessage("JIXB exception unmarshalling"), e);
 		}

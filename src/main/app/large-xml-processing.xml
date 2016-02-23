@@ -64,16 +64,35 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
         </batch:input>
         <batch:process-records>
             <batch:step name="Batch_Step">
-                <component class="com.mulesoft.services.batch.BatchUnmarshal" doc:name="Java"/>
-                <enricher source="#[payload]" target="#[flowVars['productInsertResult']]" doc:name="Message Enricher">
-                    <db:insert config-ref="MySQL_Configuration" doc:name="Insert to DB">
-                        <db:parameterized-query><![CDATA[INSERT INTO Products (ProductFullName) VALUES (#[payload.productDetails.productNo])]]></db:parameterized-query>
-                    </db:insert>
-                </enricher>
-                <set-payload value="#[payload.transactions.getTransactionList()]" doc:name="Set the payload to be all the transactions"/>
-                <db:insert config-ref="MySQL_Configuration" bulkMode="true" doc:name="Insert into transactions">
-                    <db:parameterized-query><![CDATA[INSERT INTO Transactions (refID) VALUES (#[payload.refID])]]></db:parameterized-query>
+                <set-payload value="#[payload]" encoding="UTF-8" mimeType="application/xml" doc:name="Set Payload"/>
+                <dw:transform-message metadata:id="566a128a-4594-4cf1-8c7c-9a46f1dfdcc7" doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+%namespace ns0 http://hoares.digital.batch/Products.xsd
+---
+{
+    productDetails : {
+        productNo : payload.ns0#product.ns0#productDetails.ns0#productNo,
+    	transactionList : payload.ns0#product.ns0#transactions map $
+}
+}
+]]></dw:set-payload>
+                </dw:transform-message>
+                 <enricher source="#[payload]" target="#[flowVars['productInsertResult']]" doc:name="Insert Product into DB">
+                <db:insert config-ref="MySQL_Configuration" doc:name="Insert to DB">
+                    <db:parameterized-query><![CDATA[INSERT INTO Products (ProductFullName) VALUES (#[payload.productDetails.productNo])]]></db:parameterized-query>
                 </db:insert>
+                </enricher>
+                <set-payload value="#[payload.productDetails.transactionList]" doc:name="Prepare to insert transactions"/>
+                 
+                 <enricher source="#[payload]" target="#[flowVars['transactionInsert']]" doc:name="Insert Transactions into DB">
+                 <db:insert config-ref="MySQL_Configuration" bulkMode="true" doc:name="Insert into transactions">
+                        <db:parameterized-query><![CDATA[INSERT INTO Transactions (refID) VALUES (#[payload.refID])]]></db:parameterized-query>
+                </db:insert>
+                </enricher>
+                
+                
+                
             </batch:step>
         </batch:process-records>
         <batch:on-complete>
